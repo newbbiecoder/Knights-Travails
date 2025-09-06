@@ -1,47 +1,51 @@
-function boardRules(arr) {
-    if(arr[0] > 7 || arr[0] < 0) {
-        return false;
-    }
+function boardRules(x, y) {
+    if(x > 7 || x < 0) return false;
+    if(y > 7 || y < 0) return false;
     return true;
 }
 
 function knightMoves(start, end) {
-    let movementCoords = [];
+    let movementCoord = [
+        [1,2],
+        [2,1],
+        [-1,2],
+        [2,-1],
+        [-2,1],
+        [1,-2],
+        [-1,-2],
+        [-2,-1]
+    ]
 
-    movementCoords.push([start[0] + 1, start[1]], [start[0], start[1] + 1], [start[0] - 1, start[1]], [start[0], start[1] - 1]);
-    
-    for(let i = 0; i < movementCoords.length; i++) {
-        if(movementCoords[i][0] > 7 ||  movementCoords[i][0] < 0){
-            movementCoords.splice(i, 1)
-        }
-        if(movementCoords[i][1] > 7 || movementCoords[i][1] < 0){
-            movementCoords.splice(i, 1);
-        }
-    }
     let q = [];
     let visited = [];
 
-    q.push(start);
+    q.push([start]);
+
     while(q.length > 0) {
-        for(const i of movementCoords) {
-            let path = q.shift();
-            let [x,y] = path;
-            visited.push(path);
+        let path = q.shift();
+        let [x,y] = path[path.length - 1];
 
-            let newX = x + i[0];
-            let newY = y + i[1];
+        for(let [dx, dy] of movementCoord) {
 
-            if(!boardRules([newX, newY])) return visited.map(JSON.stringify).filter((e,i,a) => i === a.indexOf(e)).map(JSON.parse);
+            let newX = x + dx;
+            let newY = y + dy;
+
+            // Check if newX, newY doesn't violate board rules
+            if(!boardRules(newX, newY)) continue;
+            
+            // Check if newX, newY already been visited
+            if(visited.some(([dx, dy]) => dx === newX && dy === newY)) continue;
+
+            let newPath = [...path, [newX, newY]];
 
             if(newX === end[0] && newY === end[1]) {
-                visited.push(end);
-                return visited.map(JSON.stringify).filter((e,i,a) => i === a.indexOf(e)).map(JSON.parse)
+                return newPath;
             }
 
-            q.push([...path]);
-            q.push([newX, newY]);
+            q.push(newPath);
+            visited.push([newX, newY]);
         }
     }
 }
 
-console.log(knightMoves([0,0],[3,3]));
+console.log(knightMoves([0,0],[7,7]));
